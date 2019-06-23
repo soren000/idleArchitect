@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-
 import AppContext from '../context/app-context';
+// import useBuild from '../custom-hooks/useBuild';
 
 const allRequirements = {
     house: {
@@ -16,20 +16,11 @@ const BuildingContainer = ({ building }) => {
     const buildFunction = context[`set${capitalizedBuildingName}`];
     const { wood: woodOwned, money: moneyOwned, setError } = context;
 
-    const build = () => {
-
-        const { wood: woodNeeded, money: moneyNeeded } = allRequirements[building];
-        
-        if (moneyNeeded > moneyOwned && woodNeeded > woodOwned) {
-            return setError(`You need ${moneyNeeded-moneyOwned} money and ${woodNeeded-woodOwned} wood`)
-        }
-        
-        buildFunction(buildingQuantity + 1);
-    }
+    // const build = useBuild();
 
     return (
         <div className={`buildingContainer buildingContainer-${building.toLowerCase()}`}>
-            <button onClick={() => build()}>Build</button>
+            {/* <button onClick={() => useBuild( { building: 'house' })}>Build</button> */}
             <p>{capitalizedBuildingName}: {buildingQuantity}</p>
         </div>
     )

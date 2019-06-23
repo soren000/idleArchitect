@@ -67,11 +67,18 @@ button {
 		text-align: left;
 		display: flex;
         flex-direction: row;
-        font-size: 1.2em;
+        font-size: .9em;
 
 		&:not(.resourceContainer-money):not(.resourceContainer-prestige) {
-			font-size: .8em;
-		}
+			font-weight: 300;
+        }
+        
+        &-money {
+            color: gold;
+        }        
+        &-prestige {
+            color: green;
+        }
 	}
 
 	.buildingContainer {

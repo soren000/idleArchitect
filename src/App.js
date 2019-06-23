@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import AppContext from './context/app-context';
-import useInterval from './useInterval';
+import useInterval from './custom-hooks/useInterval';
 import ButtonMenu from './components/ButtonMenu';
 import ResourceContainer from './components/ResourceContainer';
 import BuildingContainer from './components/BuildingContainer';
 import TabButtonContainer from './components/TabButtonContainer';
 
 import './styles/main.scss';
+
+
+
 
 const App = () => {
     // GAME DEFAULT VALUES
@@ -17,7 +20,7 @@ const App = () => {
         money: 0,
         timer: 1000,
         woodImport: 0
-    }
+    };
     const moneyRate = 1;
     const moneyDefault = 0;
     const timerDefault = 1000;
@@ -29,15 +32,19 @@ const App = () => {
     const buildingTabDefault = "generic";
     const errorDefault = "";
     const eventsDefault = [];
+    const prestigeDefault = 0;
+    const genericBuildingsDefault = [];
 
 
 
     let [buildingTab, setBuildingTab] = useState(localStorage.getItem('buildingTab') || buildingTabDefault);
     let [money, setMoney] = useState(parseInt(localStorage.getItem('money')) || moneyDefault);
+    let [prestige, setPrestige] = useState(parseInt(localStorage.getItem('prestige')) || prestigeDefault);
     let [timer, setTimer] = useState(parseInt(localStorage.getItem('timer')) || timerDefault);
     let [woodImport, setWoodImport] = useState(parseInt(localStorage.getItem('woodImport')) || woodImportDefault);
     let [wood, setWood] = useState(parseInt(localStorage.getItem('wood')) || woodDefault);
     let [house, setHouse] = useState(parseInt(localStorage.getItem('house')) || houseDefault);
+    let [genericBuildings, setGenericBuildings] = useState(localStorage.getItem('genericBuildings') && localStorage.getItem('genericBuildings').split(',') || genericBuildingsDefault);
     let [error, setError] = useState(localStorage.getItem('error') || errorDefault);
     let [events, setEvents] = useState(localStorage.getItem('events') && localStorage.getItem('events').split(',') || eventsDefault);
 
@@ -49,10 +56,12 @@ const App = () => {
 
     useEffect(() => {
         localStorage.setItem('money', money);
+        localStorage.setItem('prestige', prestige);
         localStorage.setItem('wood', wood);
         localStorage.setItem('timer', timer);
         localStorage.setItem('woodImport', woodImport);
         localStorage.setItem('events', events);
+        localStorage.setItem('genericBuildings', genericBuildings);
     });
 
     useEffect(() => {
@@ -79,7 +88,20 @@ const App = () => {
 
     return (
         <div className="App">
-            <AppContext.Provider value={{ resetAll, setTimer, setWoodImport, woodImport, wood, money, house, setHouse, buildingTab, setBuildingTab, error, setError }}>
+            <AppContext.Provider value={{ 
+                    resetAll, 
+                    setTimer, 
+                    setWoodImport, 
+                    woodImport, 
+                    wood, 
+                    money, 
+                    house, 
+                    setHouse, 
+                    buildingTab, 
+                    setBuildingTab, 
+                    error, 
+                    setError
+                }}>
                 {error &&
                     <div className="errorContainer">{error}</div>
                 }
