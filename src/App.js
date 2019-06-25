@@ -1,12 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import ReactTooltip from 'react-tooltip';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import AppContext from './context/app-context';
 import useInterval from './custom-hooks/useInterval';
 import ButtonMenu from './components/ButtonMenu';
-import ResourceContainer from './components/ResourceContainer';
-import BuildingContainer from './components/BuildingContainer';
-import TabButtonContainer from './components/TabButtonContainer';
+import Resource from './components/Resource';
+import GenericBuilding from './components/GenericBuilding';
+import GenericBuildingContainer from './components/GenericBuildingContainer';
+import HUDTabContainer from './components/HUDTabContainer';
+
+import resourcesReducer from './reducers/resourcesReducer';
+import metaReducer from './reducers/metaReducer';
+import importsReducer from './reducers/importsReducer';
+import errorReducer from './reducers/errorReducer';
+import genericBuildingsReducer from './reducers/genericBuildingsReducer';
+import {
+    stateResourcesDefault,
+    stateImportsDefault,
+    stateGenericBuildingsDefault,
+    stateMetaDefault,
+    stateErrorDefault
+} from './objects/stateDefaults';
 
 import './styles/main.scss';
 
@@ -14,118 +29,87 @@ import './styles/main.scss';
 
 
 const App = () => {
-    // GAME DEFAULT VALUES
-    const defaults = {
-        moneyRate: 1,
-        money: 0,
-        timer: 1000,
-        woodImport: 0
-    };
-    const moneyRate = 1;
-    const moneyDefault = 0;
-    const timerDefault = 1000;
-    const woodImportDefault = 0;
-    const woodDefault = 0;
-    const moneyToWoodDeficitRate = 4;
-    const woodSurplusRate = 1;
-    const houseDefault = 0;
-    const buildingTabDefault = "generic";
-    const errorDefault = "";
-    const eventsDefault = [];
-    const prestigeDefault = 0;
-    const genericBuildingsDefault = [];
+    const resourcesStorage = JSON.parse(localStorage.getItem('resources')) || stateResourcesDefault;
+    const metaStorage = JSON.parse(localStorage.getItem('meta')) || stateMetaDefault;
+    const genericBuildingsStorage = JSON.parse(localStorage.getItem('genericBuildings')) || stateGenericBuildingsDefault;
+    const importsStorage = JSON.parse(localStorage.getItem('imports')) || stateImportsDefault;
+    const errorStorage = localStorage.getItem('error') || stateErrorDefault;
 
-
-
-    let [buildingTab, setBuildingTab] = useState(localStorage.getItem('buildingTab') || buildingTabDefault);
-    let [money, setMoney] = useState(parseInt(localStorage.getItem('money')) || moneyDefault);
-    let [prestige, setPrestige] = useState(parseInt(localStorage.getItem('prestige')) || prestigeDefault);
-    let [timer, setTimer] = useState(parseInt(localStorage.getItem('timer')) || timerDefault);
-    let [woodImport, setWoodImport] = useState(parseInt(localStorage.getItem('woodImport')) || woodImportDefault);
-    let [wood, setWood] = useState(parseInt(localStorage.getItem('wood')) || woodDefault);
-    let [house, setHouse] = useState(parseInt(localStorage.getItem('house')) || houseDefault);
-    let [genericBuildings, setGenericBuildings] = useState(localStorage.getItem('genericBuildings') && localStorage.getItem('genericBuildings').split(',') || genericBuildingsDefault);
-    let [error, setError] = useState(localStorage.getItem('error') || errorDefault);
-    let [events, setEvents] = useState(localStorage.getItem('events') && localStorage.getItem('events').split(',') || eventsDefault);
+    const [stateResources, dispatchResources] = useReducer(resourcesReducer, resourcesStorage);
+    const [stateMeta, dispatchMeta] = useReducer(metaReducer, metaStorage);
+    const [stateGenericBuildings, dispatchGenericBuildings] = useReducer(genericBuildingsReducer, genericBuildingsStorage);
+    const [stateImports, dispatchImports] = useReducer(importsReducer, importsStorage);
+    const [stateError, dispatchError] = useReducer(errorReducer, errorStorage);
 
 
     useInterval(() => {
-        setMoney(money + moneyRate - (woodImport * moneyToWoodDeficitRate));
-        setWood(wood + (woodImport * woodSurplusRate));
-    }, timer);
+        dispatchResources({ type: "MONEY", imports: stateImports });
+    }, stateMeta.tickRate);
+
 
     useEffect(() => {
-        localStorage.setItem('money', money);
-        localStorage.setItem('prestige', prestige);
-        localStorage.setItem('wood', wood);
-        localStorage.setItem('timer', timer);
-        localStorage.setItem('woodImport', woodImport);
-        localStorage.setItem('events', events);
-        localStorage.setItem('genericBuildings', genericBuildings);
-    });
+        localStorage.setItem('resources', JSON.stringify(stateResources));
+    }, [stateResources]);
 
     useEffect(() => {
-    }, [money])
+        localStorage.setItem('meta', JSON.stringify(stateMeta));
+    }, [stateMeta]);
 
     useEffect(() => {
+        localStorage.setItem('genericBuildings', JSON.stringify(stateGenericBuildings));
+    }, [stateGenericBuildings]);
+
+    useEffect(() => {
+        localStorage.setItem('imports', JSON.stringify(stateImports));
+    }, [stateImports]);
+
+    useEffect(() => {
+        localStorage.setItem('error', stateError);
         setTimeout(() => {
-            setError('')
+            dispatchError({ type: "RESET_ALL" });
         }, 3000)
-    }, [error])
+    }, [stateError]);
 
-
-    const resetAll = () => {
-        setMoney(moneyDefault);
-        setTimer(timerDefault);
-        setWoodImport(woodImportDefault);
-        setError(errorDefault);
-        setHouse(houseDefault);
-        setWood(woodDefault);
-        setEvents(eventsDefault);
-    };
-
-    const resourcesToShow = 'prestige money wood';
+    // useEffect(() => {
+    //     // setTimeout(() => {
+    //     //     setError('')
+    //     // }, 3000)
+    // }, [error])
 
     return (
         <div className="App">
-            <AppContext.Provider value={{ 
-                    resetAll, 
-                    setTimer, 
-                    setWoodImport, 
-                    woodImport, 
-                    wood, 
-                    money, 
-                    house, 
-                    setHouse, 
-                    buildingTab, 
-                    setBuildingTab, 
-                    error, 
-                    setError
-                }}>
-                {error &&
-                    <div className="errorContainer">{error}</div>
-                }
+            <AppContext.Provider value={{
+                stateResources,
+                dispatchResources,
+                stateMeta,
+                dispatchMeta,
+                stateGenericBuildings,
+                dispatchGenericBuildings,
+                stateImports,
+                dispatchImports,
+                stateError,
+                dispatchError
+            }}>
                 <h1>Idle Architect</h1>
                 <ButtonMenu />
+                <ReactCSSTransitionGroup
+                    transitionName="fade"
+                    transitionEnterTimeout={300}
+                    transitionLeaveTimeout={300}
+                >{stateError && <div key="error" className="errorContainer">{stateError}</div>}</ReactCSSTransitionGroup>
                 <div className="consoleMenu">
                     <div className="consoleMenuSubContainer">
-                        {resourcesToShow.split(' ').map((resource, index) => <ResourceContainer key={index} resource={resource} />)}
-                    </div>
-                    <div className="consoleMenuSubContainer">
-                        <div className="eventsContainer">
-                            {events.map((event, index) => <div className="eventEntry" key={index}>{event}</div>)}
+                        <HUDTabContainer column={'resources'} />
+                        <div className="resourceContainer">
+                            {Object.keys(stateResources).map((resource, index) => <Resource key={index} resource={resource} />)}
                         </div>
                     </div>
                     <div className="consoleMenuSubContainer">
-                        <TabButtonContainer />
-                        {buildingTab === 'generic' &&
-                            <div className="genericBuildingContainer">
-                                <BuildingContainer building={'house'} />
-                            </div>
-                        }
-                        {buildingTab === 'unique' &&
-                            <p>Nothing here right now. Check back later</p>
-                        }
+                    </div>
+                    <div className="consoleMenuSubContainer">
+                        <HUDTabContainer column={'buildings'} />
+                        {stateMeta.buildingTab === 'generic' && <GenericBuildingContainer />}
+                        {stateMeta.buildingTab === 'unique' && <p>Nothing here right now. Check back later</p>}
                     </div>
                 </div>
             </AppContext.Provider>

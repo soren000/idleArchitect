@@ -1,0 +1,12 @@
+                {error &&
+                    <div className="errorContainer">{error}</div>
+                }
+
+
+                                        <div className="eventsContainer">
+                            {events.map((event, index) => <div className="eventEntry" key={index}>{event}</div>)}
+                        </div>
+
+
+                        
+                <ButtonMenu />

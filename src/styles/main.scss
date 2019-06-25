@@ -35,6 +35,20 @@ button {
 	background-color: inherit;
 	padding: 0.5rem;
 	box-shadow: 0px 0px 3px 1px black;
+
+	&.buildingButton,
+	&.importButton {
+		outline: none;
+		border: none;
+		box-shadow: none;
+		margin-left: 0.5rem;
+		cursor: pointer;
+
+		&:hover {
+			color: lightblue;
+			text-decoration: underline;
+		}
+	}
 }
 
 .buttonMenu {
@@ -62,73 +76,101 @@ button {
 		}
 	}
 
-	.resourceContainer,
+	.resourceSubContainer,
 	.buildingContainer {
 		text-align: left;
 		display: flex;
-        flex-direction: row;
-        font-size: .9em;
+		flex-direction: row;
+		font-size: 0.9em;
+		border-bottom: 1px solid black;
+		padding: 3px 0;
 
 		&:not(.resourceContainer-money):not(.resourceContainer-prestige) {
 			font-weight: 300;
-        }
-        
-        &-money {
-            color: gold;
-        }        
-        &-prestige {
-            color: green;
-        }
+		}
+
+		&-money p {
+			color: gold;
+		}
+		&-prestige p {
+			color: green;
+		}
 	}
 
 	.buildingContainer {
-		border-bottom: 1px solid black;
-		padding: 3px 0;
-    }
-    
-    .tabButtonContainer {
-        margin-bottom: .5rem;
+	}
 
-        .tabButton {
-            margin: .5rem;
-            outline: none;
-            border: none;
-            box-shadow: none;
-            font-size: .8em;
-            font-weight: 300;
-            cursor: pointer;
+	.tabButtonContainer {
+		margin-bottom: 0.5rem;
 
-            &:hover {
-                color: lightblue;
-            }
+		.tabButton {
+			margin: 0.5rem;
+			outline: none;
+			border: none;
+			box-shadow: none;
+			font-size: 0.8em;
+			font-weight: 300;
+			cursor: pointer;
 
-            &-active {
-                text-decoration: underline;
-            }
-        }
-    }
+			&:hover {
+				color: lightblue;
+			}
 
-    .genericBuildingContainer { 
-        border-top: 1px solid black;
-    }
+			&-active {
+				text-decoration: underline;
+			}
+		}
+	}
+
+	.genericBuildingContainer,
+	.resourceContainer {
+		border-top: 1px solid black;
+	}
 }
 
 .errorContainer {
-    width: 100%;
-    position:fixed;
-    top:0;
-    left: 0;
-    padding: 5px 0;
-    font-size:.8em;
-    color: white;
-    box-shadow: 0px 0px 5px 2px black;
-    background:linear-gradient(red, darken(red, 25));
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	padding: 5px 0;
+	font-size: 0.8em;
+	color: white;
+	box-shadow: 0px 0px 5px 2px black;
+	background: linear-gradient(red, darken(red, 25));
 }
 
 .eventsContainer {
-    flex-direction: column;
-    text-align: left;
-    font-size: .6em;
-    text-indent: 1rem;
-    padding: 10px;
+	flex-direction: column;
+	text-align: left;
+	font-size: 0.6em;
+	text-indent: 1rem;
+	padding: 10px;
+}
+
+.fade-enter {
+	opacity: 0.01;
+}
+
+.fade-enter-active {
+	opacity: 1;
+	transition: opacity 300ms ease-in;
+}
+
+.fade-leave {
+	opacity: 1;
+}
+
+.fade-leave-active {
+    opacity: 0.01;
+	transition: opacity 300ms ease-in;
+}
+
+.fade-appear {
+    opacity: 0;
+}
+
+.fade-appear-active {
+    opacity: 1;
+	transition: opacity 300ms ease-in;
 }
